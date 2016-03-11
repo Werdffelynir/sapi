@@ -28,6 +28,9 @@ class Sapi
             $this->programName = trim(array_shift($argv));
             $this->command = trim(array_shift($argv));
             $this->options = $argv;
+
+            $this->cmd_welcome();
+
             if(empty($this->programName) || ($this->programName=='-h'||$this->programName=='--help') )
                 $this->cmd_help();
             else
@@ -37,7 +40,6 @@ class Sapi
 
     public function cmd_welcome()
     {
-        $this->cmd_welcome();
         $xver = $this->version;
         print_r("\n");
         print_r("---------------- S.A.P.I [$xver] ---------------\n");
@@ -198,7 +200,7 @@ class Sapi
      * @param $callback
      * @param $self
      */
-    static public function confirm($message, $callback, $self)
+    static public function confirm($message, $callback, $self = null)
     {
         $message = $message ? $message : "Confirm Yes/No: ";
         self::input($message, function ($response) use ($message, $callback, $self) {
