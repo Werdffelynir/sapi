@@ -1,0 +1,246 @@
+#!/usr/local/bin/php
+<?php
+
+/**
+ * Example: "php sapi command opt1 opt2 opt3 opt4"
+ * $argc - 6 (args num)
+ * $argv - [sapi, command, op...] array input words
+ */
+class Sapi
+{
+
+    private $argv = [];
+    private $program = null;
+    private $programFile = null;
+    private $programName = null;
+    private $command = null;
+    private $options = [];
+
+    public $version = '0.0.1';
+    public $config = [
+        'programs_dir' => __DIR__ . '/programs/'
+    ];
+
+    public function __construct($argv)
+    {
+        $this->argv = $argv;
+        if (array_shift($argv) == 'sapi') {
+            $this->programName = trim(array_shift($argv));
+            $this->command = trim(array_shift($argv));
+            $this->options = $argv;
+            if(empty($this->programName) || ($this->programName=='-h'||$this->programName=='--help') )
+                $this->cmd_help();
+            else
+                $this->execute($this->programName);
+        }
+    }
+
+    public function cmd_welcome()
+    {
+        $this->cmd_welcome();
+        $xver = $this->version;
+        print_r("\n");
+        print_r("---------------- S.A.P.I [$xver] ---------------\n");
+        print_r("------------php-command-line-utility------------\n");
+    }
+
+
+    public function cmd_help()
+    {
+        self::console("[sapi] Help my...");
+    }
+
+    /**
+     * @param $program
+     */
+    public function execute($program)
+    {
+        $file = $this->config['programs_dir'] . $program . '.php';
+        if (is_file($file)) {
+            try{
+                require_once($file);
+                $this->programFile = $file;
+                $this->program = new $program($this, $this->command, $this->options);
+                call_user_func_array([$this->program, "init"], $this->options);
+            }catch(Exception $e){
+                self::console("[sapi] ERROR, php catch exception: {$e->getMessage()}");
+            }
+        }
+        else self::console("[sapi] ERROR, file not exist: $file");
+    }
+
+
+    /**
+     * @param $filename
+     * @param array $changeData
+     * @param bool $saveChange
+     * @return array|int|string
+     */
+    public  function parseIni($filename, array $changeData = [], $saveChange = false) {
+        $ini = parse_ini_file($filename, true);
+        if(!empty($changeData)){
+            $fn = $saveChange ? $filename : false;
+            $iniChanged = $this->createIni($fn, $ini);
+            return $iniChanged;
+        }
+        return $ini;
+    }
+
+
+    private $iniTmp;
+    /**
+     * Create or/and overwrite ini file, pull $array as configs
+     *
+     * @param $file
+     * @param $iniData
+     * @param int $i
+     * @return int|string
+     */
+    /**
+     * @param $file
+     * @param array $iniData
+     * @param int $i
+     * @return string
+     */
+    public function createIni($file, array $iniData, $i = 0){
+
+        if(!$this->iniTmp && $i===0){
+            $this->iniTmp.= "; Sapi generator ini configs. ".PHP_EOL;
+            $this->iniTmp.= "; Activator `$this->programName`, last change: " . date('m.d.Y H:i:s').PHP_EOL;
+        }
+
+        foreach ($iniData as $k => $v){
+            if (is_array($v)){
+                $this->iniTmp.= PHP_EOL.PHP_EOL."[$k]".PHP_EOL;
+                foreach($v as $k2 => $v2){
+                    if (is_array($v2))
+                        foreach ($v2 as $k3 => $v3)
+                            $this->iniTmp .= "$k2"."[$k3] = '$v3'". PHP_EOL;
+                    else $this->iniTmp.="$k2 = '$v2'".PHP_EOL;
+                }
+            }
+        }
+
+        if($file){
+            if(is_file($file) && file_put_contents($file, $this->iniTmp))
+                return $this->iniTmp;
+            else
+                self::console("[sapi] ERROR in createIni:\n\t1. - file not exist: $file.
+                                \n\t2. - or problem with function file_put_contents()");
+        } else
+            return $this->iniTmp;
+    }
+
+    /**
+     * Parses INI file adding extends functionality via ":base" postfix on namespace.
+     *
+     * @param string $filename
+     * @return array
+     */
+    public function parseIniNamespace($filename) {
+        $ini = parse_ini_file($filename, true);
+        $config = array();
+        foreach($ini as $namespace => $properties){
+
+            if(strpos($namespace, ":") === false){
+                $name = $namespace; $extends = null;
+            }else
+                list($name, $extends) = explode(':', $namespace);
+
+            $name = trim($name);
+            $extends = trim($extends);
+
+            # create namespace if necessary
+            if(!isset($config[$name])) $config[$name] = [];
+
+            # inherit base namespace
+            if(isset($ini[$extends])){
+                foreach($ini[$extends] as $prop => $val)
+                    $config[$name][$prop] = $val;
+            }
+
+            # overwrite / set current namespace values
+            foreach($properties as $prop => $val)
+                $config[$name][$prop] = $val;
+        }
+        return $config;
+    }
+
+    public function iniMerge ($config_ini, $custom_ini) {
+        foreach ($custom_ini as $k => $v) {
+            if (is_array($v))
+                $config_ini[$k] = $this->iniMerge($config_ini[$k], $custom_ini[$k]);
+            else
+                $config_ini[$k] = $v;
+        }
+        return $config_ini;
+    }
+
+
+    # # # # # STATICS METHODS # # # # # #
+
+    /**
+     * @param $sendData
+     * @param $callback
+     */
+    static public function input($sendData, $callback)
+    {
+        print($sendData);
+        $stdin = fopen("php://stdin", "r");
+        $response = trim(fgets($stdin));
+        fclose($stdin);
+        if (is_callable($callback))
+            $callback($response);
+    }
+
+    /**
+     * @param $message
+     * @param $callback
+     * @param $self
+     */
+    static public function confirm($message, $callback, $self)
+    {
+        $message = $message ? $message : "Confirm Yes/No: ";
+        self::input($message, function ($response) use ($message, $callback, $self) {
+
+            switch (strtolower(trim($response))) {
+                case 'yes': case 'y':
+                    $callback(true, $self);
+                    break;
+
+                case 'no': case 'n':
+                    $callback(false, $self);
+                    break;
+
+                default:
+                    print("Try again. ");
+                    self::confirm($message, $callback, $self);
+                    break;
+            }
+        });
+    }
+
+
+    static public function console($message, $exit = false)
+    {
+        if(is_array($message) || is_object($message))
+            $message = print_r($message, true);
+
+        $message = $message ? "$message\n" : "";
+        print_r($message);
+
+        if($exit)
+            exit();
+        return $message;
+    }
+
+
+
+}
+
+function console($message, $exit = false){
+    Sapi::console($message, $exit);
+}
+
+$sapi = new Sapi($argv);
+?>

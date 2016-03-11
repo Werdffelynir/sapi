@@ -1,0 +1,11 @@
+#!/usr/local/bin/php
+<?php
+/**
+ * Example: "php sapi command opt1 opt2 opt3 opt4"
+ * $argc - 6 (args num)
+ * $argv - [sapi, command, op...] array input words
+ */
+
+//if(@mkdir('./sapidir/')){
+//    print_r("dir 'sapi' created");
+//}
