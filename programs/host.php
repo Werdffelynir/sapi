@@ -37,7 +37,7 @@ class host
 
     public function init()
     {
-        print(">> Консольная утилита 'SAPI' программа 'host' запущенна...\n");
+        print("[host] Консольная утилита 'SAPI' программа 'host' запущенна...\n");
 
         $command = "command_" . $this->command;
         if (method_exists($this, $command)) {
@@ -48,33 +48,32 @@ class host
 
     public function command_create()
     {
-
-        Sapi::input(">> Введите имя нового хоста: ", function ($response) {
+        Sapi::input("[host] Введите имя нового хоста: ", function ($response) {
             $hostName = trim($response);
             $sitePath = self::$self->conf['site_path'] . $hostName;
             $confFile = self::$self->conf['conf_path'] . $hostName;
 
-            print(">> Проверка крневой директории веб-сайта.\n");
-            print(">> $sitePath\n>> $confFile \n");
+            print("[host] Проверка крневой директории веб-сайта.\n");
+            print("[host] $sitePath\n[host] $confFile \n");
 
             if (!is_dir($sitePath)) {
-                print(">> Попытка создания файлов веб-сайта.\n");
+                print("[host] Попытка создания файлов веб-сайта.\n");
                 $result = mkdir($sitePath);
                 if (!$result) goto error;
 
                 $result = file_put_contents($sitePath . '/index.html', self::$self->tpl['html']);
                 if (!$result) goto error;
 
-                print(">>>> Успешно.\n");
+                print("[host] Успешно.\n");
             } else {
-                print(">> Похоже веб-сайт существует.\n");
-                Sapi::confirm(">> Продолжить? Y/n: ", function ($confirm) {
+                print("[host] Похоже веб-сайт существует.\n");
+                Sapi::confirm("[host] Продолжить? Y/n: ", function ($confirm) {
                     if (!$confirm)
-                        exit(">> Программа завершена.\n");
+                        exit("[host] Программа завершена.\n");
                 });
             }
 
-            print(">> Попытка создания $confFile.conf \n");
+            print("[host] Попытка создания $confFile.conf \n");
 
             $conf = str_replace("{ServerName}", $hostName, self::$self->tpl['conf']);
             $conf = str_replace("{DocumentRoot}", $sitePath, $conf);
@@ -84,35 +83,38 @@ class host
 
             $result = file_put_contents($tmp, $conf);
             if (!$result) {
-                print(">> Не удалось временный файл\n");
+                print("[host] Не удалось временный файл\n");
                 goto error;
             } else {
                 system("sudo mv $tmp $confFile.conf");
             }
 
-            Sapi::confirm(">> Добавить в hosts '127.0.0.1 $hostName www.$hostName'\n>> Открыть редактор Y/n: ",
+            /*Sapi::confirm("[host] Добавить в hosts '127.0.0.1 $hostName www.$hostName'\n[host] Открыть редактор Y/n: ",
                 function ($confirm) {
                     if ($confirm)
                         system("sudo gedit /etc/hosts");
                     else
-                        exit(">> Программа завершена.\n");
-                });
+                        exit("[host] Программа завершена.\n");
+                });*/
+            print("[host] Добавление в hosts '127.0.0.1 $hostName www.$hostName'\n");
+            system("sudo echo '127.0.0.1    $hostName    www.$hostName' [host] /etc/hosts");
+            sleep(1);
 
-            print(">> Активаыия хоста ...\n");
+            print("[host] Активаыия хоста ...\n");
             sleep(1);
 
             system("sudo a2ensite $hostName.conf");
             sleep(1);
 
-            print(">> Перезагрузка сервера ...\n");
+            print("[host] Перезагрузка сервера ...\n");
             system("sudo /etc/init.d/apache2 restart");
 
-            print(">> Сайт должен быть доступен на хосте 'http://$hostName'\n");
+            print("[host] Сайт должен быть доступен на хосте 'http://$hostName'\n");
 
-            print(">> ");
+            print("[host] ");
             goto end;
             error:
-            print(">> Ошибка. ");
+            print("[host] Ошибка. ");
             end:
             print("Программа завершена.\n");
 
@@ -123,28 +125,28 @@ class host
     public function command_remove()
     {
 
-        Sapi::input(">> Имя хоста что будет удален: ", function ($response) {
+        Sapi::input("[host] Имя хоста что будет удален: ", function ($response) {
             $hostName = trim($response);
             $sitePath = self::$self->conf['site_path'] . $hostName;
             $confFile = self::$self->conf['conf_path'] . $hostName;
 
             if (is_dir($sitePath)) {
-                Sapi::confirm(">> Найдены файлы ваб-сайта $sitePath\n>> Удалить все? Y/n: ",
+                Sapi::confirm("[host] Найдены файлы ваб-сайта $sitePath\n[host] Удалить все? Y/n: ",
                     function ($yes) use ($sitePath) {
                         if ($yes) {
-                            print(">> Попытка удаления ваб-сайта ...\n");
+                            print("[host] Попытка удаления ваб-сайта ...\n");
                             system("sudo rm -r $sitePath");
                         }
                     });
             } else {
-                print(">>>> Файлы ваб-сайта не найдены, удалять нечего.\n");
+                print("[host] Файлы ваб-сайта не найдены, удалять нечего.\n");
             }
 
 
-            print(">> Попытка удаления $confFile.conf \n");
+            print("[host] Попытка удаления $confFile.conf \n");
             system("sudo rm $confFile.conf");
 
-            print(">> ");
+            print("[host] ");
             print("Программа завершена.\n");
         });
     }
