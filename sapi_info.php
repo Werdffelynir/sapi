@@ -1,10 +1,132 @@
 #!/usr/local/bin/php
 <?php
+
+?>
+
 /**
  * Example: "php sapi command opt1 opt2 opt3 opt4"
  * $argc - 6 (args num)
  * $argv - [sapi, command, op...] array input words
  */
+
+// ========================================== ==========================================
+
+====
+system — Выполняет внешнюю программу и отображает её вывод
+==========================================
+string system ( string $command [, int &$return_var ] )
+
+
+====
+exec() - Исполняет внешнюю программу
+==========================================
+string exec ( string $command [, array &$output [, int &$return_var ]] )
+echo exec('whoami');
+
+
+====
+passthru() - Выполняет внешнюю программу и отображает необработанный вывод
+==========================================
+void passthru ( string $command [, int &$return_var ] )
+Функция passthru() похожа на функцию exec() в том, что она выполняет команду command.
+Должна быть использована вместо функции exec() или system() когда вывод команды Unix является двоичными данными, которые необходимо передать непосредственно в браузер.
+<?php
+passthru ('echo $PATH');
+?>
+
+
+====
+popen() - Открывает файловый указатель процесса
+==========================================
+
+resource popen ( string $command , string $mode )
+$handle = popen("/bin/ls", "r");
+<?php
+error_reporting(E_ALL);
+
+/* Добавляем перенаправление, чтобы прочитать stderr. */
+$handle = popen('/path/to/executable 2>&1', 'r');
+echo "'$handle'; " . gettype($handle) . "\n";
+$read = fread($handle, 2096);
+echo $read;
+pclose($handle);
+?>
+
+
+====
+escapeshellarg() Экранирует строку для того, чтобы она могла быть использована как аргумент командной строки
+==========================================
+string escapeshellarg ( string $arg )
+system('ls '.escapeshellarg($dir));
+
+
+====
+escapeshellcmd() - Экранирует метасимволы командной строки
+==========================================
+
+
+
+
+====
+shell_exec — Выполняет команду через шелл и возвращает полный вывод в виде строки
+==========================================
+string shell_exec ( string $cmd )
+
+<?php
+$output = shell_exec('ls -lart');
+echo "<pre>$output</pre>";
+?>
+
+
+Эта функция недоступна в безопасном режиме.
+
+<?php
+$cmd = 'set';
+echo "<pre>".shell_exec($cmd)."</pre>";
+?>
+
+
+If you're trying to run a command such as "gunzip -t" in shell_exec and getting an empty result,
+you might need to add 2>&1 to the end of the command, eg:
+
+Won't always work:
+echo shell_exec("gunzip -c -t $path_to_backup_file");
+
+Should work:
+echo shell_exec("gunzip -c -t $path_to_backup_file 2>&1");
+
+
+====
+
+==========================================
+
+
+====
+
+==========================================
+
+
+====
+About the problem of zombies, you may call a bash script like this:
+==========================================
+--------------------------
+#! /bin/bash
+ulimit -t 60
+
+<your command here>
+--------------------------
+
+
+
+
+
+
+
+
+
+
+
+
 
 
 
