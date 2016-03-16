@@ -113,7 +113,7 @@ About the problem of zombies, you may call a bash script like this:
 #! /bin/bash
 ulimit -t 60
 
-<your command here>
+< your command here >
 --------------------------
 
 

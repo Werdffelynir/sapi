@@ -3,7 +3,7 @@
 /**
  * php var/sapi/sapi template create /var/www/site.loc
  */
-class template
+class ren
 {
 
     private $sapi;
@@ -21,8 +21,11 @@ class template
         $this->sapi = $sapi;
         $this->command = $command;
         $this->options = $options;
+        Sapi::$renderPath = __DIR__.'/';
     }
-
+/*    ServerName <?=$serverName?>
+    DocumentRoot <?=$documentRoot?>
+    <Directory <?=$directory?>>*/
     /**
      * @param null|string $p1
      * @param null|string $p2
@@ -31,9 +34,19 @@ class template
      */
     public function init($p1 = null, $p2 = null, $p3 = null, $p4 = null)
     {
-        print_r("# Получина комманда: $this->command и " . func_num_args() . "аргументов\n" .
-                "# Dump:\n" .
-                print_r(func_get_args(), true));
+        /*
+        print_r(Sapi::renderPHP('host_conf', [
+            'ServerName' => 'XXX',
+            'DocumentRoot' => 'OOO',
+            'Directory' => 'ZZZ',
+        ]));
+        */
+
+        print_r(Sapi::render('host_conf', [
+            'ServerName' => 'XXX',
+            'DocumentRoot' => 'OOO',
+            'Directory' => 'ZZZ',
+        ]));
     }
 
 

@@ -1,0 +1,13 @@
+<VirtualHost *:80>
+    ServerName {{ServerName}}
+    DocumentRoot {{DocumentRoot}}
+    <Directory {{Directory}}>
+        Options Indexes FollowSymLinks
+        AllowOverride None
+        Require all granted
+        RewriteEngine On
+        RewriteCond %{REQUEST_FILENAME} !-d
+        RewriteCond %{REQUEST_FILENAME} !-f
+        RewriteRule ^ index.php [QSA,L]
+    </Directory>
+</VirtualHost>

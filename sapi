@@ -236,13 +236,43 @@ class Sapi
         return $message;
     }
 
+    static public $renderPath = '';
+    static public function renderPHP($view, array $data = [], $returned = true)
+    {
+        $viewPathname = self::$renderPath.rtrim($view,'.php').'.php';
+        if (!is_file($viewPathname))
+            throw new \RuntimeException("File `$view` does not exist, path: `$viewPathname`");
+        extract($data);
+        ob_start();
+        require($viewPathname);
+        if($returned)
+            return ob_get_clean();
+        else
+            echo ob_get_clean();
+    }
 
+    static public function render($view, array $data = [], $returned = true)
+    {
+        $viewPathname = self::$renderPath.trim($view);
+        if (!is_file($viewPathname))
+            throw new \RuntimeException("File `$view` does not exist, path: `$viewPathname`");
+
+        $fileData = file_get_contents($viewPathname);
+        foreach($data as $key => $val){
+            $fileData = str_replace("{{".$key."}}", $val, $fileData);
+        }
+        if($returned)
+            return $fileData;
+        else
+            echo $fileData;
+    }
 
 }
 
 function console($message, $exit = false){
     Sapi::console($message, $exit);
 }
-
+$view = 'programs/index.php';
+$v = trim($view).( (substr('/index.php',-4) == '.php') ?: '.php' );
 $sapi = new Sapi($argv);
 ?>
