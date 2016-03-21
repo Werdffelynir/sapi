@@ -108,8 +108,10 @@ class host
         }
         sleep(1);
 
-        print("[host] Добавление в hosts '127.0.0.1 $hostName www.$hostName'\n");
+        system("sudo chmod 777 /etc/hosts");
+        print("[host] Попытка добавления конфигурации в /etc/hosts \n[host] 127.0.0.1 $hostName www.$hostName\n");
         system("sudo echo '127.0.0.1    $hostName    www.$hostName' >> /etc/hosts");
+        system("sudo chmod 755 /etc/hosts");
         sleep(1);
 
         print("[host] Активаыия хоста ...\n");
