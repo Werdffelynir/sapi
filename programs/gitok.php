@@ -1,10 +1,11 @@
 <?php
 
 /**
- * php var/sapi/sapi gitok project -a -c push pull
+ * php sapi gitok project -f push
  *
- * add project 'path' 'branch'
- * delete project
+ * gitok add project 'path' 'branch'
+ * gitok delete project
+ *
  * project -a
  * project add
  * project -c

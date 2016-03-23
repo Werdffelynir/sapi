@@ -1,13 +1,18 @@
 <VirtualHost *:80>
+    # Domain name
     ServerName {{ServerName}}
+    # Execute file
+    #DirectoryIndex index.php
+    # Physical location of the web files
     DocumentRoot {{DocumentRoot}}
     <Directory {{Directory}}>
-        Options Indexes FollowSymLinks
-        AllowOverride None
-        Require all granted
-        RewriteEngine On
-        RewriteCond %{REQUEST_FILENAME} !-d
-        RewriteCond %{REQUEST_FILENAME} !-f
-        RewriteRule ^ index.php [QSA,L]
+        # Enable the .htaccess rewrites
+        AllowOverride All
+        Order allow,deny
+        Allow from All
     </Directory>
+
+    # Logs exists
+    #ErrorLog /var/log/apache2/{{ServerName}}_error.log
+    #CustomLog /var/log/apache2/{{ServerName}}_access.log combined
 </VirtualHost>

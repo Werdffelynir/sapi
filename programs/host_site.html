@@ -22,6 +22,32 @@
     <div id="content">
         <p>Path to site files:</p>
         <pre>{{path}}/index.html</pre>
+
+        <br>
+
+        <p>Path to apache config:</p>
+        <pre>/etc/apache2/conf-enabled/{{host}}.conf</pre>
+
+        <br>
+
+        <p>Config for <code>.htaccess</code>:</p>
+        <pre>
+&lt;IfModule mod_rewrite.c&gt;
+    RewriteEngine On
+
+    #RewriteBase /
+
+    RewriteCond %{REQUEST_FILENAME} !-f
+    RewriteRule ^(.*)$ index.php [QSA,L]
+&lt;/IfModule&gt;</pre>
+
+        <br>
+
+        <p>Commands:</p>
+        <pre>sudo gedit /etc/apache2/conf-enabled/{{host}}.conf</pre>
+        <pre>sudo gedit /etc/php5/apache2/php.ini</pre>
+        <pre>sudo /etc/init.d/apache2 restart</pre>
+
     </div>
     <div id="footer">
         <p>Powered by SAPI generator. Complete {{date}}</p>
