@@ -108,23 +108,6 @@ class host
         }
         sleep(1);
 
-
-
-
-
-
-
-
-
-
-
-
-        
-
-
-
-
-
         system("sudo chmod 777 /etc/hosts");
         print("[host] Попытка добавления конфигурации в /etc/hosts \n[host] 127.0.0.1 $hostName www.$hostName\n");
         system("sudo echo '127.0.0.1    $hostName    www.$hostName' >> /etc/hosts");
