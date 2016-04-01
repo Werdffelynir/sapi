@@ -42,7 +42,6 @@ class Sapi
     public function cmd_welcome()
     {
         $xver = $this->version;
-        print_r("\n");
         print_r("---------------- S.A.P.I [$xver] ---------------\n");
         print_r("------------php-command-line-utility------------\n");
     }
@@ -50,7 +49,8 @@ class Sapi
 
     public function cmd_help()
     {
-        self::console("[sapi] Help my...");
+        self::console("[sapi] Help:");
+        self::console("[sapi] host [create|remove] [host_name]");
     }
 
     /**
