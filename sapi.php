@@ -16,7 +16,7 @@ class Sapi
 
     public $version = '0.0.1';
     public $config = [
-        'programs_dir' => __DIR__ . '/programs/'
+        'programs_dir' => '/var/sapi/programs/'
     ];
 
     public function __construct($argv)
