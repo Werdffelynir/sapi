@@ -3,8 +3,6 @@
 
 /**
  * Example: "php sapi command opt1 opt2 opt3 opt4"
- * $argc - 6 (args num)
- * $argv - [sapi, command, op...] array input words
  */
 class Sapi
 {
@@ -18,7 +16,7 @@ class Sapi
 
     public $version = '0.0.1';
     public $config = [
-        'programs_dir' => __DIR__ . '/programs/'
+        'programs_dir' => '/var/sapi/programs/'
     ];
 
     public function __construct($argv)
@@ -59,6 +57,7 @@ class Sapi
     public function execute($program)
     {
         $file = $this->config['programs_dir'] . $program . '.php';
+                
         if (is_file($file)) {
             try{
                 require_once($file);

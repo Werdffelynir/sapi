@@ -67,7 +67,7 @@ class host
             $result = mkdir($sitePath);
             if (!$result) goto error;
 
-            $siteHtml = Sapi::render('host_site.html',[
+            $siteHtml = Sapi::render('host/host_site.html',[
                 'host' => $hostName,
                 'path' => $sitePath,
                 'date' => date("m.d.Y H:i"),
@@ -87,7 +87,7 @@ class host
 
         print("[host] Попытка создания $confFile.conf \n");
 
-        $conf = Sapi::render('host_conf', [
+        $conf = Sapi::render('host/host_conf', [
             'ServerName' => $hostName,
             'DocumentRoot' => $sitePath,
             'Directory' => $sitePath,
@@ -175,7 +175,6 @@ class host
         print("Программа завершена.\n");
 
     }
-
 
 }
 
